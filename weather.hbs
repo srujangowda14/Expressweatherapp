@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{>headerlinks}}
+</head>
+<body>
+    {{>navbar}}
+    <div class="container-fluid main_header">
+      <div class="row mt-5">
+        <div class="col-md-12 col-12 mx-auto">
+          <div class="city_name">
+              <form class="form_style">
+                  <input type="text" placeholder="Enter your City name" id="cityName" class="i_city_name" autocomplete="off"/>
+                  <button class="btn btn-primary search_style" id="submitBtn">Search</button>
+              </form>
+          </div>
+          <div class="weather_container">
+              <div class="weather_card">
+                <div class="day">
+                  <p id="day">Tuesday</p>
+                  <p id="today_data">13 OCT</p>
+                </div>
+              <div class="weather_display">
+                  <h2 id="city_name">You will get the output here</h2>
+                  <div class="data_hide">
+                    <h1><span id="temp"> </span> °C</h1>
+                    <p id="temp_status"><i class="fas fa-cloud"></i></p>
+                  </div>
+              </div>
+             </div>
+          </div>
+          
+      </div>
+      </div>
+    </div>
+    <script>
+      const cityName=document.getElementById("cityName");
+      const submitBtn=document.getElementById("submitBtn");
+      const city_name=document.getElementById("city_name");
+      const temp=document.getElementById("temp");
+      const temp_status=document.getElementById("temp_status");
+      const dataHide=document.querySelector(".data_hide");
+      const date=new Date();
+
+      const day=document.getElementById("day");
+      const today_data=document.getElementById("today_data");
+
+      const getDayInLetter = () =>{
+          const weekDay=new Array(7);
+          weekDay[0]="Sunday";
+          weekDay[1]="Monday";
+          weekDay[2]="Tuesday";
+          weekDay[3]="Wednesday";
+          weekDay[4]="Thursday";
+          weekDay[5]="Friday";
+          weekDay[6]="Saturday";
+          let myDay=date.getDay();
+          return weekDay[myDay];
+      }
+
+      const getDateAndMonth = ( )=>{
+          var months=["Jan","Feb","Mar","Apr","May","June","July","Aug","Sep","Oct","Nov","Dec"];
+          var month=months[date.getMonth()];
+
+          var todayDay=date.getDate();
+
+          return `${todayDay} ${month}`;
+      }
+
+     
+
+      day.innerText=getDayInLetter();
+      today_data.innerText=getDateAndMonth();
+      
+      const getInfo = async(event) =>{
+          event.preventDefault();
+          let cityVal=cityName.value;
+          
+          if(cityVal===""){
+               city_name.innerText=`Plz write the name before search`;
+               dataHide.classList.add('data_hide');
+          }else{
+               try{
+                   let url=`http://api.openweathermap.org/data/2.5/weather?q=${cityVal}&units=metric&appid=e9d227f2c69273cf1c7cc83cf0f4507c`;
+                   const response=await fetch(url);
+                   const data=await response.json();
+                   const arrData=[data];
+                   city_name.innerText=`${arrData[0].name}, ${arrData[0].sys.country}`;
+                   temp.innerText=arrData[0].main.temp;
+                   const tempMood=arrData[0].weather[0].main;
+
+                   if(tempMood==="Clouds"){
+                       temp_status.innerHTML=
+                           "<i class='fas fa-cloud' style='font-size:50px; '></i>";
+                   }
+                   else if(tempMood==="Rain"){
+                       temp_status.innerHTML=
+                            "<i class='fas fa-cloud-rain' style='font-size:50px;'></i>";
+                   }
+                   else if(tempMood==="Clear"){
+                       temp_status.innerHTML=
+                            "<i class='fas fa-sun' style='font-size: 50px; color:orange;'></i>";
+                   }
+                   else{
+                       temp_status.innerHTML=
+                             "<i class='fas fa-cloud' style='font-size:50px;'></i>";
+                   }
+                   dataHide.classList.remove('data_hide');
+
+               }catch{
+                   city_name.innerText=`Plz enter the city name properly`;
+                   dataHide.classList.add('data_hide');
+               }   
+          }
+      }
+      submitBtn.addEventListener('click',getInfo);
+      
+      
+  </script>
+</body>
+
+</html>
